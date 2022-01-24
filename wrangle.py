@@ -112,6 +112,24 @@ def outlier_function(df, cols, k):
         df = df[(df[col] < upper_bound) & (df[col] > lower_bound)]
     return df
 
+def nulls_by_col(df):
+    num_missing = df.isnull().sum()
+    rows = df.shape[0]
+    prcnt_miss = num_missing / rows * 100
+    cols_missing = pd.DataFrame({'num_rows_missing': num_missing, 'percent_rows_missing': prcnt_miss})
+    
+    return cols_missing
+
+def nulls_by_row(df):
+    num_missing = df.isnull().sum(axis=1)
+    prcnt_miss = num_missing / df.shape[1] * 100
+    rows_missing = pd.DataFrame({'num_cols_missing': num_missing, 'percent_cols_missing': prcnt_miss})\
+    .reset_index()\
+    .groupby(['num_cols_missing', 'percent_cols_missing']).count()\
+    .rename(index=str, columns={'customer_id': 'num_rows'}).reset_index()
+    
+    return rows_missing
+
 def summarize(df):
     '''
     summarize will take in a single argument (a pandas dataframe)
